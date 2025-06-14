@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algoritmos</title>
+    <link rel="stylesheet" href="/index.css">
+    <link rel="icon" href="/TaskMasterIcon.png" type="image/png">
+    <script defer src="/Algorithms.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/Projects.html">Proyectos</a></li>
+                <li><a href="/Algorithms.html">Algoritmos</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="algorithms-container">
+        <!-- Tabla de Algoritmos -->
+        <div class="table-container">
+            <h2>Lista de Algoritmos</h2>
+            <table class="algorithms-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Enunciado</th>
+                        <th>Lenguaje</th>
+                        <th>Ruta Solución</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-algoritmos">
+                    <!-- Se cargarán los algoritmos dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Formulario para agregar/editar algoritmos -->
+        <div class="form-container">
+            <h2>Agregar o Modificar Algoritmo</h2>
+            <form id="algorithm-form">
+                <input type="hidden" id="id-algoritmo">
+
+                <label for="enunciado">Enunciado:</label>
+                <textarea id="enunciado" required></textarea>
+
+                <label for="lenguaje">Lenguaje de la solución:</label>
+                <select id="lenguaje" required>
+                    <option value="" disabled selected>Selecciona un lenguaje</option>
+                    <option value="Python">Python</option>
+                    <option value="C#">C# o C++</option>
+                    <option value="JavaScript">JavaScript</option>
+                </select>
+
+
+                <label for="ruta">Ruta del archivo:</label>
+                <input type="text" id="ruta" required>
+
+                <button type="button" class="btn-addFile" onclick="abrirArchivo()">Seleccionar archivo</button>
+                <button type="submit" class="btn-insert">Guardar Algoritmo</button>
+            </form>
+        </div>
+    </section>
+
+</body>
+</html>

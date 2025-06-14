@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Proyectos</title>
+    <link rel="stylesheet" href="/index.css">
+    <link rel="icon" href="/TaskMasterIcon.png" type="image/png">
+    <script defer src="/Projects.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/Projects.html">Proyectos</a></li>
+                <li><a href="/Algorithms.html">Algoritmos</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="projects-container">
+        <!-- Tabla de Proyectos -->
+        <div class="table-container">
+            <h2>Lista de Proyectos</h2>
+            <table class="projects-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Lenguaje</th>
+                        <th>Horas Invertidas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-proyectos">
+                    <!-- Se cargarán los proyectos dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Formulario para agregar/editar proyectos -->
+        <div class="form-container">
+            <h2>Agregar o Modificar Proyecto</h2>
+            <form id="project-form">
+                <input type="hidden" id="id-proyecto">
+
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" required>
+
+                <label for="descripcion">Descripción:</label>
+                <textarea id="descripcion" required></textarea>
+
+                <label for="lenguaje">Lenguaje de programación:</label>
+                <select id="lenguaje">
+                    <option value="" disabled selected>Selecciona un lenguaje</option>
+                    <option value="Python">Python</option>
+                    <option value="C#">C#</option>
+                    <option value="JavaScript">JavaScript</option>
+                </select>
+
+                <label for="horas">Horas invertidas:</label>
+                <input type="number" id="horas" required>
+
+                <button type="submit" class="btn-insert">Guardar Proyecto</button>
+            </form>
+        </div>
+    </section>
+</body>
+</html>

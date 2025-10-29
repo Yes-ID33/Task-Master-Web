@@ -1,0 +1,50 @@
+
+services:
+
+  app:
+      build: 
+        context: .
+        dockerfile: ./Dockerfile.app
+      container_name: tareas-app
+      ports:
+        - "3511:3511"
+      depends_on:
+        - db
+      develop: #para actualizar el contenedor cada vez que se guarde un cambio en el IDE
+      watch:
+        - path: .
+          action: rebuild
+      volumes:
+        - .:/app
+        - /app/node_modules
+      command: npm run dev
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: tareas-db
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "S3rv3r123!"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+    volumes:
+      - sqlvolume:/var/opt/mssql
+      - ./src/Public/init.sql:/init.sql
+
+  db-init:
+    image: mcr.microsoft.com/mssql-tools
+    depends_on:
+      - db
+    volumes:
+      - ./src/Public/init.sql:/init.sql
+    entrypoint: >
+      /bin/bash -c "
+      sleep 50;
+      /opt/mssql-tools/bin/sqlcmd -S db -U sa -P S3rv3r123! -d master -i /init.sql;
+      echo '✅ Script init.sql ejecutado';
+      "
+
+
+volumes:
+  sqlvolume:

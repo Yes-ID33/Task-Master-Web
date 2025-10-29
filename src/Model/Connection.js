@@ -1,85 +1,63 @@
 import sql from "mssql";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const config = {
-    user: "sa",
-    password: "s3rv3r",
-    server: "DESKTOP-DQC08B4",
-    database: "RoadMap2025",
-    options: {
-        encrypt: true, // Requerido para conexiones seguras
-        enableArithAbort: true,
-        trustServerCertificate: true
-    },
-    pool: {
-        max: 10,  // ✅ ConnectionLimit: Máximo número de conexiones activas
-        min: 1,   // Mínimo de conexiones
-        idleTimeoutMillis: 30000, // Tiempo antes de cerrar una conexión inactiva
-    }
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  server: process.env.DB_SERVER,
+  database: process.env.DB_DATABASE,
+  options: {
+    encrypt: true,
+    enableArithAbort: true,
+    trustServerCertificate: true
+  },
+  pool: {
+    max: 10,
+    min: 1,
+    idleTimeoutMillis: 30000
+  }
 };
 
-// 📌 Creación del pool de conexiones
-const poolPromise = new sql.ConnectionPool(config)
-    .connect()
-    .then(pool => {
-        console.log("✅ Conexión a SQL Server exitosa.");
-        return pool;
-    })
-    .catch(err => {
-        console.error("❌ Error al conectar con SQL Server:", err);
-        throw err;
-    });
+const MAX_RETRIES = 10;
+const RETRY_DELAY = 3000;
 
-// 📌 Métodos de la base de datos (Optimizado con `poolPromise`)
-const db = {
-    // 🟢 Buscar usuario por email
-    async findByEmail(email) {
-        try {
-            let pool = await poolPromise;
-            let result = await pool.request()
-                .input("email", sql.VarChar, email)
-                .query("SELECT * FROM users WHERE email = @email");
-
-            return result.recordset[0];
-        } catch (error) {
-            console.error("❌ Error al buscar usuario por email:", error.message);
-            throw error;
-        }
-    },
-
-    // 🟡 Crear un nuevo usuario
-    async createUser(name, email, hashedPassword) {
-        try {
-            let pool = await poolPromise;
-            let result = await pool.request()
-                .input("name", sql.VarChar, name)
-                .input("email", sql.VarChar, email)
-                .input("password", sql.VarChar, hashedPassword)
-                .query("INSERT INTO users (name, email, password) VALUES (@name, @email, @password)");
-
-            return result;
-        } catch (error) {
-            console.error("❌ Error al crear usuario:", error.message);
-            throw error;
-        }
-    },
-
-    // 🔵 Ejecutar consulta directa (Para otros casos)
-    async query(sqlQuery, params = {}) {
-        try {
-            let pool = await poolPromise;
-            let request = pool.request();
-
-            for (const param in params) {
-                request.input(param, params[param].type, params[param].value);
-            }
-
-            let result = await request.query(sqlQuery);
-            return result.recordset;
-        } catch (error) {
-            console.error("❌ Error en consulta SQL:", error.message);
-            throw error;
-        }
+async function connectWithRetry(attempt = 1) {
+  try {
+    const pool = await new sql.ConnectionPool(config).connect();
+    console.log("✅ Conexión a SQL Server exitosa.");
+    return pool;
+  } catch (err) {
+    console.error(`❌ Intento ${attempt} fallido:`, err.message);
+    if (attempt < MAX_RETRIES) {
+      await new Promise(res => setTimeout(res, RETRY_DELAY));
+      return connectWithRetry(attempt + 1);
+    } else {
+      throw new Error("❌ No se pudo conectar a SQL Server después de varios intentos.");
     }
+  }
+}
+
+const poolPromise = connectWithRetry();
+
+const db = {
+  async query(sqlQuery, params = {}) {
+    try {
+      let pool = await poolPromise;
+      let request = pool.request();
+
+      for (const param in params) {
+        request.input(param, params[param].type, params[param].value);
+      }
+
+      let result = await request.query(sqlQuery);
+      return result.recordset;
+    } catch (error) {
+      console.error("❌ Error en consulta SQL:", error.message);
+      throw error;
+    }
+  }
 };
 
 export { poolPromise, sql };

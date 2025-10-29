@@ -4,16 +4,20 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node ./src/Model/Server.js"
+    "dev": "nodemon ./src/Model/Server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "express": "^5.1.0",
     "mssql": "^11.0.1",
     "path": "^0.12.7",
     "url": "^0.11.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }
